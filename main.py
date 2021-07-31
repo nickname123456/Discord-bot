@@ -155,8 +155,8 @@ async def on_message(message):
         else:
             await message.channel.send(text)
 
-    if message.content.startswith('!покажи дурова'):
+    if message.content.startswith('!пикча'):
         await message.channel.send("http://lorempixel.com/" + str(random.randint(100, 1000)) +  "/" + str(random.randint(100, 1000)) + "/")
 
 
-client.run("ODcwOTY1NTk1NTY5NTQxMTIw.YQUb6w.f5qi9Ohsttbllk354xLjOuTnZpM")
+client.run("ODcwOTY1NTk1NTY5NTQxMTIw.YQUb6w.4yj1or4VS0clKq_ovI0NW7eYadA")
