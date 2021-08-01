@@ -188,8 +188,21 @@ async def пикча(ctx):
 
 
 @client.command()
+@commands.has_permissions(administrator = True)
 async def удали(ctx, amount = 10):
-    await ctx.channel.purge(limit = amount)
+    try:
+        await ctx.channel.purge(limit = amount)
+    except discord.ext.commands.errors.MissingPermissions:
+        await ctx.send('Недостаточно прав!')
+
+
+@client.command()
+@commands.has_permissions(administrator=True)
+async def кик(ctx, member: discord.Member, *, reason = 'просто так'):
+    await member.kick(reason = reason)
+    await ctx.send(str(member) + 'удален!')
+
+
 
 
 client.run("ODcwOTY1NTk1NTY5NTQxMTIw.YQUb6w.4yj1or4VS0clKq_ovI0NW7eYadA")
