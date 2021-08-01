@@ -1,4 +1,5 @@
 import discord
+from discord.ext import commands
 import os
 import requests
 import random
@@ -117,11 +118,7 @@ REPLACEMENT_MAP = {
 }
 
 
-
-
-
-
-client = discord.Client()
+client = commands.Bot(command_prefix= "!")
 
 
 
@@ -132,16 +129,22 @@ client = discord.Client()
 async def on_ready():
     print('We have logged in as {0.user}'.format(client))
 
-
+'''
 @client.event
 async def on_message(message):
     if message.author == client.user:
         return
 
-    if message.content.startswith('!бот'):
-        await message.channel.send('Слит(')
+    msg = message.content.lower()
 
-    if message.content.startswith('!переверни '):
+    if msg == '!бот':
+        await message.channel.send('Слит(')
+    
+    if msg.startswith('!удали '):
+        print(msg[7:])
+        await message.channel.purge(limit = msg[7:])
+
+    if msg.startswith('!переверни '):
         text = message.content[11:]
         final_str = ""
         for char in text:
@@ -155,8 +158,38 @@ async def on_message(message):
         else:
             await message.channel.send(text)
 
-    if message.content.startswith('!пикча'):
+    if msg == '!пикча':
         await message.channel.send("http://lorempixel.com/" + str(random.randint(100, 1000)) +  "/" + str(random.randint(100, 1000)) + "/")
+'''
+
+@client.command()
+async def бот(ctx):
+    await ctx.send('Слит(')
+
+
+@client.command()
+async def переверни(ctx, text):
+    final_str = ""
+    for char in text:
+        if char in REPLACEMENT_MAP.keys():
+            new_char = REPLACEMENT_MAP[char]
+        else:
+            new_char = char
+        final_str += new_char
+    if text != final_str:
+        await ctx.send(final_str)
+    else:
+        await ctx.send(text)
+
+
+@client.command()
+async def пикча(ctx):
+    await ctx.send("http://lorempixel.com/" + str(random.randint(100, 1000)) + "/" + str(random.randint(100, 1000)) + "/")
+
+
+@client.command()
+async def удали(ctx, amount = 10):
+    await ctx.channel.purge(limit = amount)
 
 
 client.run("ODcwOTY1NTk1NTY5NTQxMTIw.YQUb6w.4yj1or4VS0clKq_ovI0NW7eYadA")
