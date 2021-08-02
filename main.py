@@ -1,10 +1,12 @@
 from sys import prefix
 import discord
+from discord import colour
 from discord.embeds import Embed
 from discord.ext import commands
 import os
 import requests
 import random
+import datetime
 
 REPLACEMENT_MAP = {
     "a": "ɐ",
@@ -220,8 +222,17 @@ async def кик(ctx, member: discord.Member, *, reason = 'просто так')
 @commands.has_permissions(administrator=True)
 
 async def бан(ctx, member: discord.Member, *, reason='просто так'):
+    emb = discord.Embed(colour = discord.Color.red())
+
     await member.ban(reason = reason)
-    await ctx.send(f'{member.mention} забанен по причине: {reason}!')
+
+    emb.set_author(name = member.name, icon_url = member.avatar_url)
+    emb.add_field(name='Бан игрока', value=f'{member.mention} забанен по причине: {reason}!')
+    emb.set_footer(text = f'администратор {ctx.author.name}', icon_url = ctx.author.avatar_url)
+
+    await ctx.send(embed = emb)
+
+    #await ctx.send(f'{member.mention} забанен по причине: {reason}!')
 
 
 
@@ -249,12 +260,23 @@ async def помощь(ctx):
     emb.add_field( name=f'{PREFIX}удали [кол-во сообщений]', value='чистит чат' )
     emb.add_field( name=f'{PREFIX}кик [упоминание участника]', value='удаляет человека с сервера' )
     emb.add_field( name=f'{PREFIX}бан [упоминание участника]', value='блокирует доступ к серверу' )
-    emb.add_field(
-        name=f'{PREFIX}разбан [имя и тэг]', value='разблокирует доступ к серверу')
+    emb.add_field(name=f'{PREFIX}разбан [имя и тэг]', value='разблокирует доступ к серверу')
 
     await ctx.send(embed = emb)
 
 
+@client.command()
+async def тест(ctx):
+    emb = discord.Embed(title='Тайтл', description = 'description' , colour = discord.Color.dark_magenta(), url = 'https://d2xzmw6cctk25h.cloudfront.net/post/2236/og_image/39ed77ccb6aab5ebc24f4f59a94f1674.png')
+    emb.set_author(name= client.user.name, icon_url= client.user.avatar_url)
+    emb.set_footer(text = ctx.author.name, icon_url= ctx.author.avatar_url)
+    emb.set_image(url = 'https://media.istockphoto.com/photos/clock-face-9-oclock-picture-id489971205')
+    emb.set_thumbnail(url = 'https://play-lh.googleusercontent.com/Wvjx6rVlC1rGWKkln3r-23ICKV--sxEEUuq7jd15BeJan8v-wS7TGwm0NHXqqon18w')
+    
+    now_date = datetime.datetime.now()
+    emb.add_field(name=now_date, value='текущее время')
+
+    await ctx.send(embed = emb)
 
 
 
