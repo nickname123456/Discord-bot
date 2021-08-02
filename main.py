@@ -1,4 +1,6 @@
+from sys import prefix
 import discord
+from discord.embeds import Embed
 from discord.ext import commands
 import os
 import requests
@@ -117,8 +119,9 @@ REPLACEMENT_MAP = {
     'ю': 'oı'
 }
 
-
-client = commands.Bot(command_prefix= "!")
+PREFIX = '!'
+client = commands.Bot(PREFIX)
+client.remove_command('help')
 
 
 
@@ -163,11 +166,14 @@ async def on_message(message):
 '''
 
 @client.command()
+
 async def бот(ctx):
     await ctx.send('Слит(')
 
 
+
 @client.command()
+
 async def переверни(ctx, text):
     final_str = ""
     for char in text:
@@ -182,13 +188,17 @@ async def переверни(ctx, text):
         await ctx.send(text)
 
 
+
 @client.command()
+
 async def пикча(ctx):
     await ctx.send("http://lorempixel.com/" + str(random.randint(100, 1000)) + "/" + str(random.randint(100, 1000)) + "/")
 
 
+
 @client.command()
 @commands.has_permissions(administrator = True)
+
 async def удали(ctx, amount = 10):
     try:
         await ctx.channel.purge(limit = amount)
@@ -196,13 +206,57 @@ async def удали(ctx, amount = 10):
         await ctx.send('Недостаточно прав!')
 
 
+
 @client.command()
 @commands.has_permissions(administrator=True)
+
 async def кик(ctx, member: discord.Member, *, reason = 'просто так'):
     await member.kick(reason = reason)
-    await ctx.send(str(member) + 'удален!')
+    await ctx.send(f'{member.mention} удален по причине: {reason}!')
+
+
+
+@client.command()
+@commands.has_permissions(administrator=True)
+
+async def бан(ctx, member: discord.Member, *, reason='просто так'):
+    await member.ban(reason = reason)
+    await ctx.send(f'{member.mention} забанен по причине: {reason}!')
+
+
+
+@client.command()
+@commands.has_permissions(administrator=True)
+
+async def разбан(ctx, *, member):
+    banned_users = await ctx.guild.bans()
+
+    for ban_entry in banned_users:
+        user = ban_entry.user
+        if str(user) == str(member):
+            await ctx.guild.unban(user)
+            await ctx.send(f'{user.mention} разблокирован!')
+            return
+
+
+
+@client.command()
+async def помощь(ctx):
+    emb = discord.Embed(title='Навигация')
+
+    emb.add_field( name=f'{PREFIX}переверни [текст]', value='переворачивает ваш текст' )
+    emb.add_field( name=f'{PREFIX}пикча', value='показывает случайную картинку' )
+    emb.add_field( name=f'{PREFIX}удали [кол-во сообщений]', value='чистит чат' )
+    emb.add_field( name=f'{PREFIX}кик [упоминание участника]', value='удаляет человека с сервера' )
+    emb.add_field( name=f'{PREFIX}бан [упоминание участника]', value='блокирует доступ к серверу' )
+    emb.add_field(
+        name=f'{PREFIX}разбан [имя и тэг]', value='разблокирует доступ к серверу')
+
+    await ctx.send(embed = emb)
 
 
 
 
-client.run("ODcwOTY1NTk1NTY5NTQxMTIw.YQUb6w.4yj1or4VS0clKq_ovI0NW7eYadA")
+
+
+client.run("ODcwOTY1NTk1NTY5NTQxMTIw.YQUb6w.j73bpwnSl6nD4LjA6DzTz3IH4s4")
