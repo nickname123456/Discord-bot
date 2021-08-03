@@ -286,11 +286,22 @@ async def тест(ctx):
     await ctx.send(embed = emb)
 
 
-#@client.command()
-#@commands.has_permissions(administrator=True)
+@client.command()
+@commands.has_permissions(administrator=True)
 
-#async def мут(ctx, member : discord.Member):
-#    mute_role = discord.utils.get(ctx.message.guil.roles)
+async def мут(ctx, member : discord.Member, reason = 'по рофлу'):
+    emb = discord.Embed(colour=discord.Color.red())
+    mute_role = discord.utils.get(ctx.message.guild.roles, name= 'MUTE')
+    
+    await member.add_roles(mute_role)
+
+    emb.add_field(name=f'Игроку {member.name} выдано ограничение чата!',
+                  value=f'Причина: {reason}')
+    emb.set_footer(
+        text=f'администратор {ctx.author.name}', icon_url=ctx.author.avatar_url)
+
+    await ctx.send(embed=emb)
+
 
 
 
