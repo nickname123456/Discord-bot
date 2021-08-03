@@ -1,12 +1,16 @@
 from sys import prefix
 import discord
 from discord import colour
+from discord import channel
+from discord import member
 from discord.embeds import Embed
 from discord.ext import commands
 import os
+from discord.flags import Intents
 import requests
 import random
 import datetime
+import asyncio
 
 REPLACEMENT_MAP = {
     "a": "ɐ",
@@ -122,7 +126,7 @@ REPLACEMENT_MAP = {
 }
 
 PREFIX = '!'
-client = commands.Bot(PREFIX)
+client = commands.Bot(PREFIX, intents = discord.Intents.all())
 client.remove_command('help')
 
 
@@ -134,38 +138,44 @@ client.remove_command('help')
 async def on_ready():
     print('We have logged in as {0.user}'.format(client))
 
+
+
+
+@client.event
+async def on_member_join(member):
+    channel = client.get_channel(868868031982469173)
+    role = discord.utils.get(member.guild.roles, id=872091793074815046)
+
+    await member.add_roles(role)
+    await channel.send(embed = discord.Embed(description = f'Пользователь ``{member.name}`` залетел к нам!', color = 0xDE2A5A))
+    
+
+
 '''
 @client.event
-async def on_message(message):
-    if message.author == client.user:
+async def on_reaction_add(reaction, user):
+    print(1)
+    Channel = client.get_channel(871021488197738496)
+    print(2)
+    if reaction.message.channel.id != Channel:
+        print(3)
         return
-
-    msg = message.content.lower()
-
-    if msg == '!бот':
-        await message.channel.send('Слит(')
+    if reaction.emoji == ":heart:":
+        print(4)
+        Role = discord.utils.get(user.server.roles, id=872089259920724060)
+        print(5)
+        await client.add_roles(user, Role)
+        print(6)
     
-    if msg.startswith('!удали '):
-        print(msg[7:])
-        await message.channel.purge(limit = msg[7:])
-
-    if msg.startswith('!переверни '):
-        text = message.content[11:]
-        final_str = ""
-        for char in text:
-            if char in REPLACEMENT_MAP.keys():
-                new_char = REPLACEMENT_MAP[char]
-            else:
-                new_char = char
-            final_str += new_char
-        if text != final_str:
-            await message.channel.send(final_str)
-        else:
-            await message.channel.send(text)
-
-    if msg == '!пикча':
-        await message.channel.send("http://lorempixel.com/" + str(random.randint(100, 1000)) +  "/" + str(random.randint(100, 1000)) + "/")
+    if reaction.emoji == ":clown:":
+        print(7)
+        Role = discord.utils.get(user.server.roles, id=872088568787529728)
+        print(8)
+        await client.add_roles(user, Role)
+        print(9)
 '''
+
+
 
 @client.command()
 
@@ -258,6 +268,7 @@ async def разбан(ctx, *, member):
 
 
 
+
 @client.command()
 async def помощь(ctx):
     emb = discord.Embed(title='Навигация')
@@ -301,6 +312,16 @@ async def мут(ctx, member : discord.Member, reason = 'по рофлу'):
         text=f'администратор {ctx.author.name}', icon_url=ctx.author.avatar_url)
 
     await ctx.send(embed=emb)
+
+
+
+
+
+@client.command()
+async def передай(ctx, member: discord.Member, message):
+    await member.send(f'{member.name}, привет! {ctx.author.name} просил передать "{message}"')
+    await ctx.send('Я передал!')
+
 
 
 
