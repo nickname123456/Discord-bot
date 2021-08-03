@@ -213,8 +213,16 @@ async def удали(ctx, amount = 10):
 @commands.has_permissions(administrator=True)
 
 async def кик(ctx, member: discord.Member, *, reason = 'просто так'):
-    await member.kick(reason = reason)
-    await ctx.send(f'{member.mention} удален по причине: {reason}!')
+    emb = discord.Embed(colour=discord.Color.red())
+
+    await member.kick(reason=reason)
+
+    emb.add_field(name=f'Игрок {member.name} удален!',
+                  value=f'Причина: {reason}')
+    emb.set_footer(
+        text=f'администратор {ctx.author.name}', icon_url=ctx.author.avatar_url)
+
+    await ctx.send(embed=emb)
 
 
 
@@ -222,17 +230,16 @@ async def кик(ctx, member: discord.Member, *, reason = 'просто так')
 @commands.has_permissions(administrator=True)
 
 async def бан(ctx, member: discord.Member, *, reason='просто так'):
-    emb = discord.Embed(colour = discord.Color.red())
+    emb = discord.Embed(colour=discord.Color.red())
 
     await member.ban(reason = reason)
 
-    emb.set_author(name = member.name, icon_url = member.avatar_url)
-    emb.add_field(name='Бан игрока', value=f'{member.mention} забанен по причине: {reason}!')
-    emb.set_footer(text = f'администратор {ctx.author.name}', icon_url = ctx.author.avatar_url)
+    emb.add_field(name=f'Игрок {member.name} заблокирован!',
+                  value=f'Причина: {reason}')
+    emb.set_footer(
+        text=f'администратор {ctx.author.name}', icon_url=ctx.author.avatar_url)
 
-    await ctx.send(embed = emb)
-
-    #await ctx.send(f'{member.mention} забанен по причине: {reason}!')
+    await ctx.send(embed=emb)
 
 
 
@@ -279,6 +286,14 @@ async def тест(ctx):
     await ctx.send(embed = emb)
 
 
+#@client.command()
+#@commands.has_permissions(administrator=True)
+
+#async def мут(ctx, member : discord.Member):
+#    mute_role = discord.utils.get(ctx.message.guil.roles)
 
 
-client.run("ODcwOTY1NTk1NTY5NTQxMTIw.YQUb6w.j73bpwnSl6nD4LjA6DzTz3IH4s4")
+
+
+
+client.run("ODcwOTY1NTk1NTY5NTQxMTIw.YQUb6w.pGjHuonNiAgJgZfBWUx3NQH7YXI")
