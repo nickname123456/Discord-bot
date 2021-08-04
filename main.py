@@ -142,6 +142,23 @@ async def on_ready():
 
 
 @client.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.MissingPermissions):
+        await ctx.send(f'{ctx.author.mention}, ты слишком мал для владения этой командой!')
+    
+    if isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send(f'{ctx.author.mention}, ты забыл написать аргумент команды)')
+    
+    if isinstance(error, commands.CommandNotFound):
+        await ctx.send(f'{ctx.author.mention}, сорян, но такую команду еще не завезли(((')
+    
+    if isinstance(error, commands.MemberNotFound):
+        await ctx.send(f'{ctx.author.mention}, такого чела нет на нашем сервере!')
+
+
+
+
+@client.event
 async def on_member_join(member):
     channel = client.get_channel(868868031982469173)
     role = discord.utils.get(member.guild.roles, id=872091793074815046)
@@ -328,4 +345,9 @@ async def передай(ctx, member: discord.Member, message):
 
 
 
-client.run("ODcwOTY1NTk1NTY5NTQxMTIw.YQUb6w.pGjHuonNiAgJgZfBWUx3NQH7YXI")
+
+
+
+
+
+client.run("")
