@@ -140,21 +140,24 @@ async def on_ready():
 
 
 
-
+'''
 @client.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.MissingPermissions):
         await ctx.send(f'{ctx.author.mention}, ты слишком мал для владения этой командой!')
     
-    if isinstance(error, commands.MissingRequiredArgument):
+    elif isinstance(error, commands.MissingRequiredArgument):
         await ctx.send(f'{ctx.author.mention}, ты забыл написать аргумент команды)')
     
-    if isinstance(error, commands.CommandNotFound):
+    elif isinstance(error, commands.CommandNotFound):
         await ctx.send(f'{ctx.author.mention}, сорян, но такую команду еще не завезли(((')
     
-    if isinstance(error, commands.MemberNotFound):
+    elif isinstance(error, commands.MemberNotFound):
         await ctx.send(f'{ctx.author.mention}, такого чела нет на нашем сервере!')
-
+    
+    else:
+        await ctx.send(f'@pupa 228, тут неожиданная ошибка: {error}')
+'''
 
 
 
@@ -168,7 +171,7 @@ async def on_member_join(member):
     
 
 
-'''
+
 @client.event
 async def on_reaction_add(reaction, user):
     print(1)
@@ -190,7 +193,7 @@ async def on_reaction_add(reaction, user):
         print(8)
         await client.add_roles(user, Role)
         print(9)
-'''
+
 
 
 
@@ -203,7 +206,8 @@ async def бот(ctx):
 
 @client.command()
 
-async def переверни(ctx, text):
+async def переверни(ctx, *, text):
+    text = text[len(text)::-1]
     final_str = ""
     for char in text:
         if char in REPLACEMENT_MAP.keys():
@@ -229,17 +233,14 @@ async def пикча(ctx):
 @commands.has_permissions(administrator = True)
 
 async def удали(ctx, amount = 10):
-    try:
-        await ctx.channel.purge(limit = amount)
-    except discord.ext.commands.errors.MissingPermissions:
-        await ctx.send('Недостаточно прав!')
+    await ctx.channel.purge(limit = amount)
 
 
 
 @client.command()
 @commands.has_permissions(administrator=True)
 
-async def кик(ctx, member: discord.Member, *, reason = 'просто так'):
+async def кик(ctx, member: discord.Member, *, reason = 'по рофлу'):
     emb = discord.Embed(colour=discord.Color.red())
 
     await member.kick(reason=reason)
@@ -256,7 +257,7 @@ async def кик(ctx, member: discord.Member, *, reason = 'просто так')
 @client.command()
 @commands.has_permissions(administrator=True)
 
-async def бан(ctx, member: discord.Member, *, reason='просто так'):
+async def бан(ctx, member: discord.Member, *, reason='по рофлу'):
     emb = discord.Embed(colour=discord.Color.red())
 
     await member.ban(reason = reason)
@@ -317,37 +318,36 @@ async def тест(ctx):
 @client.command()
 @commands.has_permissions(administrator=True)
 
-async def мут(ctx, member : discord.Member, reason = 'по рофлу'):
+async def мут(ctx, member : discord.Member, time : int):
     emb = discord.Embed(colour=discord.Color.red())
     mute_role = discord.utils.get(ctx.message.guild.roles, name= 'MUTE')
     
     await member.add_roles(mute_role)
 
     emb.add_field(name=f'Игроку {member.name} выдано ограничение чата!',
-                  value=f'Причина: {reason}')
+                  value=f'На {time} секунд')
     emb.set_footer(
         text=f'администратор {ctx.author.name}', icon_url=ctx.author.avatar_url)
 
     await ctx.send(embed=emb)
+
+    await asyncio.sleep(time)
+    emb = discord.Embed(colour=discord.Color.green())
+    emb.add_field(name=f'Игроку {member.name} возращен доступ  к чату!',
+                 value=f'он был отсранен на {time} секунд')
+    
+    await ctx.send(embed=emb)
+
+    await member.remove_roles(mute_role)
 
 
 
 
 
 @client.command()
-async def передай(ctx, member: discord.Member, message):
+async def передай(ctx, member: discord.Member, *, message):
     await member.send(f'{member.name}, привет! {ctx.author.name} просил передать "{message}"')
     await ctx.send('Я передал!')
 
 
-
-
-
-
-
-
-
-
-
-
-client.run("")
+client.run("ODcwOTY1NTk1NTY5NTQxMTIw.YQUb6w.VKdKoSyo9xKB73NaEkiNHPU8zEU")
