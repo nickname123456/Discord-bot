@@ -12,6 +12,27 @@ import random
 import datetime
 import asyncio
 
+
+
+
+playground = ['1', '2', '3',
+              '4', '5', '6',
+              '7', '8', '9']
+
+free = playground.copy()
+place = ''
+tic = ':x:'
+tac = ':o:'
+waiting_game = False
+who_ttt_wait = ''
+ttt_wait = False
+gameMember_list = {1: '', 
+                   2: ''}
+game_is_on = False
+
+
+
+
 REPLACEMENT_MAP = {
     "a": "ɐ",
     "b": "q",
@@ -140,7 +161,7 @@ async def on_ready():
 
 
 
-'''
+"""
 @client.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.MissingPermissions):
@@ -157,8 +178,7 @@ async def on_command_error(ctx, error):
     
     else:
         await ctx.send(f'@pupa 228, тут неожиданная ошибка: {error}')
-'''
-
+"""
 
 
 @client.event
@@ -350,4 +370,160 @@ async def передай(ctx, member: discord.Member, *, message):
     await ctx.send('Я передал!')
 
 
-client.run("ODcwOTY1NTk1NTY5NTQxMTIw.YQUb6w.VKdKoSyo9xKB73NaEkiNHPU8zEU")
+
+
+
+@client.command()
+async def ттт(ctx):
+    global gameMember_list
+    global waiting_game
+
+    waiting_game = True
+    for i in ctx.author.mention:
+        gameMember_list[1] += i
+    await ctx.send('Начался набор в игру крестики-нолики! \nДля входа напиши "!зайти"')
+
+
+
+@client.command()
+async def зайти(ctx):
+    global gameMember_list
+    global waiting_game
+    global game_is_on
+
+    if waiting_game == True:
+        for i in ctx.author.mention:
+            gameMember_list[2] += i
+        waiting_game == False
+        await ctx.send(f'Началась игра крестики нолики. \n:x: - {gameMember_list[1]}\n:o: - {gameMember_list[2]}')
+        game_is_on = True
+
+        await ttt(ctx)
+    else:
+        await ctx.send('Сейчас не ведется набор в игру. \nЧтобы начать набор пиши "!ттт"')
+
+
+
+
+
+async def output():
+    global place
+    place = ''
+    num = 0
+    for i in playground:
+        if num != 3:
+            place += f'|{i}'
+            num += 1
+        else:
+
+            place += f'\n'
+            place += f'-------'
+            place += f'\n|{i}'
+            num = 1
+    return place
+
+
+async def replacement(was, became):
+    was_index = playground.index(was)
+
+    playground.remove(was)
+    free.remove(was)
+    playground.insert(was_index, became)
+
+
+async def opponents_move():
+    if len(free) > 0:
+        return random.choice(free)
+
+
+async def check_win():
+    win_coord = ((0, 1, 2), (3, 4, 5), (6, 7, 8), (0, 3, 6),
+                 (1, 4, 7), (2, 5, 8), (0, 4, 8), (2, 4, 6))
+    for each in win_coord:
+        if playground[each[0]] == playground[each[1]] == playground[each[2]]:
+            return playground[each[0]]
+    return False
+
+
+
+
+async def ttt(ctx):
+    global ttt_wait, tic, who_ttt_wait, free, place, tac, waiting_game, gameMember_list, game_is_on
+    while await check_win() == False and len(free) != 0:
+        await asyncio.sleep(1)
+        while ttt_wait == False and await check_win() == False:
+            await ctx.send(f'Выберай\n {await output()}')
+            if who_ttt_wait != gameMember_list[1]:
+                who_ttt_wait = gameMember_list[1]
+                ttt_wait = True
+
+            else:
+                if await check_win() == False and ttt_wait == False:
+                    who_ttt_wait = gameMember_list[2]
+                    ttt_wait = True
+    global playground
+    if await check_win() == False and len(free) == 0:
+
+        playground = ['1', '2', '3',
+                      '4', '5', '6',
+                      '7', '8', '9']
+
+        free = playground.copy()
+        place = ''
+        tic = 'x'
+        tac = 'o'
+        waiting_game = False
+        who_ttt_wait = ''
+        ttt_wait = False
+        gameMember_list = {1: '',
+                        2: ''}
+        game_is_on = False
+
+        await ctx.send('Ничья')
+        return
+
+    
+
+    free = playground.copy()
+    place = ''
+    tic = 'x'
+    tac = 'o'
+    waiting_game = False
+    who_ttt_wait = ''
+    ttt_wait = False
+    gameMember_list = {1: '',
+                       2: ''}
+    game_is_on = False
+
+    await ctx.send(f'Выйграл :{await check_win()}:')
+
+
+@client.command()
+async def ход(ctx, num):
+    global ttt_wait
+    if not game_is_on:
+        await ctx.send(f'{ctx.author.mention}, сейчас не идет игра')
+        return
+    
+    author = ''
+    for i in ctx.author.mention:
+        author += i
+    if author != who_ttt_wait:
+        await ctx.send(f'{author}, сейчас не ты ходишь!')
+        return
+
+    if num not in free:
+        await ctx.send(f'{author}, эта клетка занята!')
+        return
+    
+    if gameMember_list[1] == who_ttt_wait:
+        await replacement(num, tic)
+        ttt_wait = False
+        
+    elif gameMember_list[2] == who_ttt_wait:
+        await replacement(num, tac)
+        ttt_wait = False
+    
+
+
+client.run("ODcwOTY1NTk1NTY5NTQxMTIw.YQUb6w.mNAn_wW-Jz-xgw6e447l30XWik0")
