@@ -3,6 +3,9 @@ import discord
 from discord import colour
 from discord import channel
 from discord import member
+from discord import voice_client
+from discord import guild
+from discord.utils import get
 from discord.embeds import Embed
 from discord.ext import commands
 import os
@@ -11,6 +14,7 @@ import requests
 import random
 import datetime
 import asyncio
+
 
 
 
@@ -157,6 +161,8 @@ client.remove_command('help')
 
 @client.event
 async def on_ready():
+    await client.change_presence(status= discord.Status.online, activity = discord.Game("Бобукс"))
+
     print('We have logged in as {0.user}'.format(client))
 
 
@@ -537,6 +543,35 @@ async def Ягуль(ctx):
 
 
 
+@client.command()
+@commands.has_permissions(administrator=True)
+async def войс(ctx):
+    global voice
+    channel = ctx.message.author.voice.channel
+    voice = get(client.voice_clients, guild = ctx.guild)
+
+    if voice and voice.is_connected():
+        await voice.move_to(channel)
+    else:
+        voice = await channel.connect()
+    await ctx.send(f'Я присоеденился к каналу {channel}')
 
 
-client.run("")
+@client.command()
+@commands.has_permissions(administrator=True)
+async def ливни(ctx):
+    channel = ctx.message.author.voice.channel
+    voice = get(client.voice_clients, guild=ctx.guild)
+
+    if voice and voice.is_connected():
+        await voice.disconnect()
+        await ctx.send(f'Я отключился от канала {channel}')
+
+
+
+
+
+
+
+
+client.run("ODcwOTY1NTk1NTY5NTQxMTIw.YQUb6w.sAku_Y-nlN3I4DlZLYzSJtU0pXY")
