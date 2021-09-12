@@ -21,8 +21,8 @@ playground = ['1', '2', '3',
 
 free = playground.copy()
 place = ''
-tic = ':x:'
-tac = ':o:'
+tic = 'x'
+tac = 'o'
 waiting_game = False
 who_ttt_wait = ''
 ttt_wait = False
@@ -161,7 +161,7 @@ async def on_ready():
 
 
 
-"""
+
 @client.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.MissingPermissions):
@@ -178,7 +178,7 @@ async def on_command_error(ctx, error):
     
     else:
         await ctx.send(f'@pupa 228, тут неожиданная ошибка: {error}')
-"""
+
 
 
 @client.event
@@ -523,7 +523,20 @@ async def ход(ctx, num):
     elif gameMember_list[2] == who_ttt_wait:
         await replacement(num, tac)
         ttt_wait = False
-    
 
 
-client.run("ODcwOTY1NTk1NTY5NTQxMTIw.YQUb6w.mNAn_wW-Jz-xgw6e447l30XWik0")
+
+
+@client.command()
+@commands.has_permissions(administrator=True)
+async def Ягуль(ctx):
+    ghoul = 1000
+    while ghoul >= 6:
+        await ctx.send(f'{ghoul}-7={ghoul-7}')
+        ghoul -= 7
+
+
+
+
+
+client.run("")
