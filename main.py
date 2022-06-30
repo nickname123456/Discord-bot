@@ -1,22 +1,18 @@
-from sys import prefix
 import discord
-from discord import colour
-from discord import channel
-from discord import member
-from discord import voice_client
-from discord import guild
 from discord.utils import get
-from discord.embeds import Embed
 from discord.ext import commands
-import os
-from discord.flags import Intents
-import requests
 import random
 import datetime
 import asyncio
+from commands.voice import leave, voice
 
-
-
+from settings import REPLACEMENT_MAP, PREFIX, id_noob_role, id_channel_threshold
+from commands.turn_over import turn_over
+from commands.random_picture import random_picture
+from commands.kick import kick
+from commands.ban import ban, unban
+from commands.help import help
+from commands.mute import mute
 
 
 playground = ['1', '2', '3',
@@ -37,120 +33,6 @@ game_is_on = False
 
 
 
-REPLACEMENT_MAP = {
-    "a": "ɐ",
-    "b": "q",
-    "c": "ɔ",
-    "d": "p",
-    "e": "ǝ",
-    "f": "ɟ",
-    "g": "ƃ",
-    "h": "ɥ",
-    "i": "ᴉ",
-    "j": "ɾ",
-    "k": "ʞ",
-    "l": "l",
-    "m": "ɯ",
-    "n": "u",
-    "o": "o",
-    "p": "d",
-    "q": "b",
-    "r": "ɹ",
-    "s": "s",
-    "t": "ʇ",
-    "u": "n",
-    "v": "ʌ",
-    "w": "ʍ",
-    "x": "x",
-    "y": "ʎ",
-    "z": "z",
-    "A": "∀",
-    "B": "B",
-    "C": "Ɔ",
-    "D": "D",
-    "E": "Ǝ",
-    "F": "Ⅎ",
-    "G": "פ",
-    "H": "H",
-    "I": "I",
-    "J": "ſ",
-    "K": "K",
-    "L": "˥",
-    "M": "W",
-    "N": "N",
-    "O": "O",
-    "P": "Ԁ",
-    "Q": "Q",
-    "R": "R",
-    "S": "S",
-    "T": "┴",
-    "U": "∩",
-    "V": "Λ",
-    "W": "M",
-    "X": "X",
-    "Y": "⅄",
-    "Z": "Z",
-    "0": "0",
-    "1": "Ɩ",
-    "2": "ᄅ",
-    "3": "Ɛ",
-    "4": "ㄣ",
-    "5": "ϛ",
-    "6": "9",
-    "7": "ㄥ",
-    "8": "8",
-    "9": "6",
-    ",": "'",
-    ".": "˙",
-    "?": "¿",
-    "!": "¡",
-    '"': ",,",
-    "'": ",",
-    "(": ")",
-    ")": "(",
-    "[": "]",
-    "]": "[",
-    "{": "}",
-    "}": "{",
-    "<": ">",
-    ">": "<",
-    "&": "⅋",
-    "_": "‾",
-    'й': 'ņ',
-    'ц': 'ǹ',
-    'у': 'ʎ',
-    'к': 'ʞ',
-    'е': 'ǝ',
-    'н': 'н',
-    'г': 'ɹ',
-    'ш': 'm',
-    'щ': 'm',
-    'з': 'ε',
-    'х': 'х',
-    'ъ': 'q',
-    'ф': 'ф',
-    'ы': 'ıq',
-    'в': 'ʚ',
-    'а': 'ɐ',
-    'п': 'u',
-    'р': 'd',
-    'о': 'о',
-    'л': 'v',
-    'д': 'ɓ',
-    'ж': 'ж',
-    'э': 'є',
-    'я': 'ʁ',
-    'ч': 'һ',
-    'с': 'ɔ',
-    'м': 'w',
-    'и': 'и',
-    'т': 'ɯ',
-    'ь': 'q',
-    'б': 'ƍ',
-    'ю': 'oı'
-}
-
-PREFIX = '!'
 client = commands.Bot(PREFIX, intents = discord.Intents.all())
 client.remove_command('help')
 
@@ -161,8 +43,7 @@ client.remove_command('help')
 
 @client.event
 async def on_ready():
-    await client.change_presence(status= discord.Status.online, activity = discord.Game("Бобукс"))
-
+    await client.change_presence(status= discord.Status.online, activity = discord.Game("Че смотришь?"))
     print('We have logged in as {0.user}'.format(client))
 
 
@@ -183,14 +64,14 @@ async def on_command_error(ctx, error):
         await ctx.send(f'{ctx.author.mention}, такого чела нет на нашем сервере!')
     
     else:
-        await ctx.send(f'@pupa 228, тут неожиданная ошибка: {error}')
+        await ctx.send(f'@StrangeSturgeon, тут неожиданная ошибка: {error}')
 
 
 
 @client.event
 async def on_member_join(member):
-    channel = client.get_channel(868868031982469173)
-    role = discord.utils.get(member.guild.roles, id=872091793074815046)
+    channel = client.get_channel(id_channel_threshold)
+    role = discord.utils.get(member.guild.roles, id=id_noob_role)
 
     await member.add_roles(role)
     await channel.send(embed = discord.Embed(description = f'Пользователь ``{member.name}`` залетел к нам!', color = 0xDE2A5A))
@@ -224,107 +105,58 @@ async def on_reaction_add(reaction, user):
 
 
 @client.command()
-
 async def бот(ctx):
     await ctx.send('Слит(')
 
 
 
 @client.command()
-
 async def переверни(ctx, *, text):
-    text = text[len(text)::-1]
-    final_str = ""
-    for char in text:
-        if char in REPLACEMENT_MAP.keys():
-            new_char = REPLACEMENT_MAP[char]
-        else:
-            new_char = char
-        final_str += new_char
-    if text != final_str:
-        await ctx.send(final_str)
-    else:
-        await ctx.send(text)
+    await turn_over(ctx, text)
 
 
 
 @client.command()
-
 async def пикча(ctx):
-    await ctx.send("http://lorempixel.com/" + str(random.randint(100, 1000)) + "/" + str(random.randint(100, 1000)) + "/")
+    await random_picture(ctx)
 
 
 
 @client.command()
 @commands.has_permissions(administrator = True)
-
 async def удали(ctx, amount = 10):
-    await ctx.channel.purge(limit = amount)
+    if amount <= 100:
+        await ctx.channel.purge(limit = amount)
+    else:
+        await ctx.send('Не, ну я тебе не дам столько удалить! палехче будь пэжэ')
 
 
 
 @client.command()
 @commands.has_permissions(administrator=True)
-
 async def кик(ctx, member: discord.Member, *, reason = 'по рофлу'):
-    emb = discord.Embed(colour=discord.Color.red())
-
-    await member.kick(reason=reason)
-
-    emb.add_field(name=f'Игрок {member.name} удален!',
-                  value=f'Причина: {reason}')
-    emb.set_footer(
-        text=f'администратор {ctx.author.name}', icon_url=ctx.author.avatar_url)
-
-    await ctx.send(embed=emb)
+    await kick(ctx, member, reason)
 
 
 
 @client.command()
 @commands.has_permissions(administrator=True)
-
 async def бан(ctx, member: discord.Member, *, reason='по рофлу'):
-    emb = discord.Embed(colour=discord.Color.red())
-
-    await member.ban(reason = reason)
-
-    emb.add_field(name=f'Игрок {member.name} заблокирован!',
-                  value=f'Причина: {reason}')
-    emb.set_footer(
-        text=f'администратор {ctx.author.name}', icon_url=ctx.author.avatar_url)
-
-    await ctx.send(embed=emb)
+    await ban(ctx, member, reason)
 
 
 
 @client.command()
 @commands.has_permissions(administrator=True)
-
 async def разбан(ctx, *, member):
-    banned_users = await ctx.guild.bans()
-
-    for ban_entry in banned_users:
-        user = ban_entry.user
-        if str(user) == str(member):
-            await ctx.guild.unban(user)
-            await ctx.send(f'{user.mention} разблокирован!')
-            return
+    await unban(ctx, member)
 
 
 
 
 @client.command()
 async def помощь(ctx):
-    emb = discord.Embed(title='Навигация')
-
-    emb.add_field( name=f'{PREFIX}переверни [текст]', value='переворачивает ваш текст' )
-    emb.add_field( name=f'{PREFIX}пикча', value='показывает случайную картинку' )
-    emb.add_field( name=f'{PREFIX}удали [кол-во сообщений]', value='чистит чат' )
-    emb.add_field( name=f'{PREFIX}кик [упоминание участника]', value='удаляет человека с сервера' )
-    emb.add_field( name=f'{PREFIX}бан [упоминание участника]', value='блокирует доступ к серверу' )
-    emb.add_field(name=f'{PREFIX}разбан [имя и тэг]', value='разблокирует доступ к серверу')
-
-    await ctx.send(embed = emb)
+    await help(ctx)
 
 
 @client.command()
@@ -343,28 +175,8 @@ async def тест(ctx):
 
 @client.command()
 @commands.has_permissions(administrator=True)
-
 async def мут(ctx, member : discord.Member, time : int):
-    emb = discord.Embed(colour=discord.Color.red())
-    mute_role = discord.utils.get(ctx.message.guild.roles, name= 'MUTE')
-    
-    await member.add_roles(mute_role)
-
-    emb.add_field(name=f'Игроку {member.name} выдано ограничение чата!',
-                  value=f'На {time} секунд')
-    emb.set_footer(
-        text=f'администратор {ctx.author.name}', icon_url=ctx.author.avatar_url)
-
-    await ctx.send(embed=emb)
-
-    await asyncio.sleep(time)
-    emb = discord.Embed(colour=discord.Color.green())
-    emb.add_field(name=f'Игроку {member.name} возращен доступ  к чату!',
-                 value=f'он был отсранен на {time} секунд')
-    
-    await ctx.send(embed=emb)
-
-    await member.remove_roles(mute_role)
+    await mute(ctx, member, time)
 
 
 
@@ -546,32 +358,13 @@ async def Ягуль(ctx):
 @client.command()
 @commands.has_permissions(administrator=True)
 async def войс(ctx):
-    global voice
-    channel = ctx.message.author.voice.channel
-    voice = get(client.voice_clients, guild = ctx.guild)
-
-    if voice and voice.is_connected():
-        await voice.move_to(channel)
-    else:
-        voice = await channel.connect()
-    await ctx.send(f'Я присоеденился к каналу {channel}')
+    await voice(ctx, client.voice_clients)
 
 
 @client.command()
 @commands.has_permissions(administrator=True)
 async def ливни(ctx):
-    channel = ctx.message.author.voice.channel
-    voice = get(client.voice_clients, guild=ctx.guild)
-
-    if voice and voice.is_connected():
-        await voice.disconnect()
-        await ctx.send(f'Я отключился от канала {channel}')
+    await leave(ctx, client.voice_clients)
 
 
-
-
-
-
-
-
-client.run("ODcwOTY1NTk1NTY5NTQxMTIw.YQUb6w.sAku_Y-nlN3I4DlZLYzSJtU0pXY")
+client.run("ODcwOTY1NTk1NTY5NTQxMTIw.YQUb6w.78Rw9yblmQ1o_WXyWd2TKTyfWaw")
